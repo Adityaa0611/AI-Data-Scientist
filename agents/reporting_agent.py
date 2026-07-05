@@ -1,21 +1,15 @@
 from fpdf import FPDF
 import os
 
-# UPDATED: We added target_column to the inputs
-def generate_pdf_report(raw_rows, clean_rows, viz_fig, ml_report_df, metric_name, target_column):
-    """
-    This is the Reporting Agent. It creates a formatted PDF document,
-    now including the generated Python code used for training.
-    """
+# UPDATED: Added output_path to the function
+def generate_pdf_report(raw_rows, clean_rows, viz_fig, ml_report_df, metric_name, target_column, output_path):
     pdf = FPDF()
     pdf.add_page()
     
-    # 1. Main Title
     pdf.set_font("Arial", style="B", size=16)
     pdf.cell(200, 10, txt="Autonomous AI Data Scientist - Final Report", ln=True, align="C")
     pdf.ln(10)
 
-    # 2. Data Cleaning Section
     pdf.set_font("Arial", style="B", size=14)
     pdf.cell(200, 10, txt="1. Data Cleaning Summary", ln=True)
     pdf.set_font("Arial", size=12)
@@ -23,7 +17,6 @@ def generate_pdf_report(raw_rows, clean_rows, viz_fig, ml_report_df, metric_name
     pdf.cell(200, 10, txt=f"Rows after cleaning (Clean Data): {clean_rows}", ln=True)
     pdf.ln(10)
 
-    # 3. Visualization Section
     pdf.set_font("Arial", style="B", size=14)
     pdf.cell(200, 10, txt="2. Exploratory Data Analysis (EDA)", ln=True)
     if viz_fig is not None:
@@ -34,7 +27,6 @@ def generate_pdf_report(raw_rows, clean_rows, viz_fig, ml_report_df, metric_name
         pdf.set_font("Arial", size=12)
         pdf.cell(200, 10, txt="No correlation heatmap was generated.", ln=True)
     
-    # 4. Machine Learning Leaderboard (New Page)
     pdf.add_page()
     pdf.set_font("Arial", style="B", size=14)
     pdf.cell(200, 10, txt="3. Machine Learning Leaderboard", ln=True)
@@ -52,16 +44,13 @@ def generate_pdf_report(raw_rows, clean_rows, viz_fig, ml_report_df, metric_name
         score_rounded = str(round(row[metric_name], 4))
         pdf.cell(50, 10, txt=score_rounded, border=1, ln=True)
 
-    # 5. NEW: Generated Machine Learning Code (New Page)
     pdf.add_page()
     pdf.set_font("Arial", style="B", size=14)
     pdf.cell(200, 10, txt="4. Auto-Generated Training Code", ln=True)
     pdf.ln(5)
     
-    # Set font to Courier (Monospace) so it looks like a real code editor
     pdf.set_font("Courier", size=9)
     
-    # Prepare the exact code string based on what metric was used
     if metric_name == "Accuracy":
         algo_code = """models = {
     "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
@@ -96,7 +85,6 @@ df = pd.read_csv('cleaned_dataset.csv')
 X = df.drop(columns=['{target_column}'])
 y = df['{target_column}']
 
-# Encode text features
 for col in X.select_dtypes(include=['object']).columns:
     le = LabelEncoder()
     X[col] = le.fit_transform(X[col].astype(str))
@@ -104,24 +92,19 @@ for col in X.select_dtypes(include=['object']).columns:
 if y.dtype == 'object':
     y = LabelEncoder().fit_transform(y.astype(str))
 
-# Split and scale
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Initialize Models
 {algo_code}
 
-# Train and evaluate
 for name, model in models.items():
     model.fit(X_train_scaled, y_train)
     predictions = model.predict(X_test_scaled)
-    # Scores are calculated here...
 """
-    # multi_cell allows long text to wrap properly within the PDF margins
     pdf.multi_cell(0, 5, txt=code_block)
 
-    report_filename = "AI_Report.pdf"
-    pdf.output(report_filename)
-    return report_filename
+    # UPDATED: Use the dynamic output_path instead of a hardcoded name
+    pdf.output(output_path)
+    return output_path
