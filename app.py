@@ -65,10 +65,13 @@ if uploaded_file is not None:
                 # Create a unique timestamp for this exact run
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 
+                # NEW: Isolate the exact CSV filename so we can pass it to the notebook
+                csv_filename = f"Cleaned_Data_{timestamp}.csv"
+                
                 # Define unique paths inside the run_history folder
                 pdf_path = f"run_history/AI_Report_{timestamp}.pdf"
                 nb_path = f"run_history/ML_Code_{timestamp}.ipynb"
-                csv_path = f"run_history/Cleaned_Data_{timestamp}.csv"
+                csv_path = f"run_history/{csv_filename}" # Use the variable here!
                 
                 # Save the CSV to the history folder
                 st.session_state.cleaned_df.to_csv(csv_path, index=False)
@@ -76,7 +79,9 @@ if uploaded_file is not None:
                 # Generate the files and save them to the history folder
                 clean_rows = len(st.session_state.cleaned_df)
                 generate_pdf_report(st.session_state.raw_rows, clean_rows, st.session_state.viz_fig, report_df, metric_name, target_column, pdf_path)
-                generate_notebook(target_column, metric_name, nb_path)
+                
+                # UPDATED: We now pass the csv_filename as the final argument
+                generate_notebook(target_column, metric_name, nb_path, csv_filename)
                 
                 # Save all the results into permanent memory
                 st.session_state.report_df = report_df

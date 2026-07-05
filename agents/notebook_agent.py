@@ -1,7 +1,7 @@
 import nbformat as nbf
 
-# UPDATED: Added output_path to the function
-def generate_notebook(target_column, metric_name, output_path):
+# UPDATED: Added csv_filename so the notebook knows exactly which file to look for
+def generate_notebook(target_column, metric_name, output_path, csv_filename):
     nb = nbf.v4.new_notebook()
 
     intro_text = f"""# Automated Machine Learning Code
@@ -22,8 +22,9 @@ from sklearn.naive_bayes import GaussianNB
 from xgboost import XGBClassifier, XGBRegressor"""
     nb.cells.append(nbf.v4.new_code_cell(imports_code))
 
+    # UPDATED: The notebook now dynamically writes the correct CSV filename!
     preprocess_code = f"""# Load the cleaned dataset
-df = pd.read_csv('cleaned_dataset.csv')
+df = pd.read_csv('{csv_filename}')
 
 X = df.drop(columns=['{target_column}'])
 y = df['{target_column}']
@@ -83,7 +84,6 @@ print(results_df)"""
     
     nb.cells.append(nbf.v4.new_code_cell(model_code))
 
-    # UPDATED: Use the dynamic output_path instead of a hardcoded name
     with open(output_path, 'w') as f:
         nbf.write(nb, f)
         
