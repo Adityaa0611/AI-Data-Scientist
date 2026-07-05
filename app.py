@@ -1,22 +1,22 @@
 import streamlit as st
 import pandas as pd
 import os
-from datetime import datetime # NEW: To create timestamps
+from datetime import datetime
 
 from agents.cleaning_agent import clean_data 
 from agents.viz_agent import generate_correlation_heatmap
 from agents.ml_agent import train_model
 from agents.reporting_agent import generate_pdf_report
 from agents.notebook_agent import generate_notebook
-from agents.qa_agent import ask_dataset_question # NEW
+from agents.qa_agent import ask_dataset_question
 
-# NEW: Automatically create the run_history folder if it doesn't exist
+# Automatically create the run_history folder if it doesn't exist
 if not os.path.exists("run_history"):
     os.makedirs("run_history")
 
 st.title("Autonomous AI Data Scientist")
 
-# NEW: Initialize the permanent memory flags so the website remembers everything
+# Initialize the permanent memory flags so the website remembers everything
 if "run_complete" not in st.session_state:
     st.session_state.run_complete = False
 
@@ -39,6 +39,7 @@ if uploaded_file is not None:
             st.session_state.cleaned_df = clean_data(raw_df)
             st.success("Data cleaning complete!")
             
+    # Once data is cleaned, reveal the rest of the app
     if st.session_state.cleaned_df is not None:
         st.write("Cleaned Data Preview:")
         st.dataframe(st.session_state.cleaned_df.head())
@@ -66,13 +67,13 @@ if uploaded_file is not None:
                 # Create a unique timestamp for this exact run
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 
-                # NEW: Isolate the exact CSV filename so we can pass it to the notebook
+                # Isolate the exact CSV filename so we can pass it to the notebook
                 csv_filename = f"Cleaned_Data_{timestamp}.csv"
                 
                 # Define unique paths inside the run_history folder
                 pdf_path = f"run_history/AI_Report_{timestamp}.pdf"
                 nb_path = f"run_history/ML_Code_{timestamp}.ipynb"
-                csv_path = f"run_history/{csv_filename}" # Use the variable here!
+                csv_path = f"run_history/{csv_filename}"
                 
                 # Save the CSV to the history folder
                 st.session_state.cleaned_df.to_csv(csv_path, index=False)
@@ -80,8 +81,6 @@ if uploaded_file is not None:
                 # Generate the files and save them to the history folder
                 clean_rows = len(st.session_state.cleaned_df)
                 generate_pdf_report(st.session_state.raw_rows, clean_rows, st.session_state.viz_fig, report_df, metric_name, target_column, pdf_path)
-                
-                # UPDATED: We now pass the csv_filename as the final argument
                 generate_notebook(target_column, metric_name, nb_path, csv_filename)
                 
                 # Save all the results into permanent memory
@@ -96,7 +95,7 @@ if uploaded_file is not None:
                 # Flip the switch! The training is complete.
                 st.session_state.run_complete = True
 
-        # NEW: Because this block is OUTSIDE the button, it will not disappear when you click download!
+        # Because this block is OUTSIDE the button, it will not disappear when you click download!
         if st.session_state.run_complete:
             st.success("Auto-Training complete! The ML Agent has selected the best model.")
             st.write("### 🏆 Model Comparison Report")
@@ -134,9 +133,9 @@ if uploaded_file is not None:
                         file_name=os.path.basename(st.session_state.csv_path),
                         mime="text/csv"
                     )
-                    # -----------------------------------------
-        # NEW: Q&A Chatbot Section
-        # This sits outside the training loop so you can chat anytime after data is cleaned
+                    
+        # -----------------------------------------
+        # Q&A Chatbot Section (Indented correctly to align with the main app flow)
         # -----------------------------------------
         st.write("---")
         st.subheader("💬 Chat with your Dataset")
