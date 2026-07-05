@@ -46,13 +46,18 @@ if uploaded_file is not None:
         target_column = st.selectbox("Select the column you want the AI to predict (Target):", columns)
         
         if st.button("Train ML Model"):
-            with st.spinner("ML Agent is encoding data and training the model..."):
+            with st.spinner("ML Agent is testing multiple algorithms (XGBoost, Random Forest, etc.)..."):
                 
-                # UPDATED: We now catch the score, the model, AND the metric_name
-                score, trained_model, metric_name = train_model(st.session_state.cleaned_df, target_column)
+                # UPDATED: We now catch 4 things, including the report_df
+                score, trained_model, metric_name, report_df = train_model(st.session_state.cleaned_df, target_column)
                 
-                st.success("Model training complete!")
+                st.success("Auto-Training complete! The ML Agent has selected the best model.")
                 
-                # Convert score to a percentage and display it with its correct name
+                # NEW: Display the comparison report as a table on the website
+                st.write("### 🏆 Model Comparison Report")
+                st.dataframe(report_df)
+                
+                # Update the main metric to show the winner's name and score
                 score_percentage = round(score * 100, 2)
-                st.metric(label=metric_name, value=f"{score_percentage}%")
+                best_model_name = report_df.iloc[0]['Model']
+                st.metric(label=f"Winner: {best_model_name} ({metric_name})", value=f"{score_percentage}%")
