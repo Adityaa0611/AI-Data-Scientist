@@ -30,3 +30,61 @@ Machine Learning: Scikit-Learn, XGBoost
 Generative AI & NLP: LangChain, Google Gemini API
 
 Document Generation: FPDF (PDFs), nbformat (Jupyter Notebooks)
+
+## 🚀 How to Run the Project
+
+Follow these steps to set up and run the Autonomous AI Data Scientist locally.
+
+### 📋 Prerequisites
+
+- **Python 3.8+** installed on your system.
+- A **Google Gemini API Key** (optional, required if you want to use the Q&A Chatbot Agent).
+
+### 🛠️ Setup Instructions
+
+1. **Clone or navigate to the project directory:**
+   ```bash
+   cd AI-Data-Scientist
+   ```
+
+2. **Create a virtual environment (recommended):**
+   - **On Windows:**
+     ```bash
+     python -m venv venv
+     ```
+   - **On macOS/Linux:**
+     ```bash
+     python3 -m venv venv
+     ```
+
+3. **Activate the virtual environment:**
+   - **On Windows (Command Prompt):**
+     ```cmd
+     venv\Scripts\activate
+     ```
+   - **On Windows (PowerShell):**
+     ```powershell
+     .\venv\Scripts\Activate.ps1
+     ```
+   - **On macOS/Linux:**
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. **Install the required dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### 💻 Running the Application
+
+1. **Start the Streamlit server:**
+   ```bash
+   streamlit run app.py
+   ```
+2. **Access the application:**
+   Open your web browser and go to:
+   [http://localhost:8501](http://localhost:8501)
+
+3. **Using the Q&A Chatbot:**
+   Enter your Google Gemini API key in the password field inside the **Chat with your Dataset** section to enable queries.

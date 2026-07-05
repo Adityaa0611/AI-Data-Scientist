@@ -134,9 +134,9 @@ if uploaded_file is not None:
                         mime="text/csv"
                     )
                     
-        # -----------------------------------------
-        # Q&A Chatbot Section (Indented correctly to align with the main app flow)
-        # -----------------------------------------
+        # ----------------------
+        # Q&A Chatbot Section
+        # ----------------------
         st.write("---")
         st.subheader("💬 Chat with your Dataset")
         st.write("Ask questions like: 'What is the average value of the target column?' or 'Which category appears most often?'")
