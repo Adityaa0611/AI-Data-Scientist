@@ -8,6 +8,7 @@ from agents.viz_agent import generate_correlation_heatmap
 from agents.ml_agent import train_model
 from agents.reporting_agent import generate_pdf_report
 from agents.notebook_agent import generate_notebook
+from agents.qa_agent import ask_dataset_question # NEW
 
 # NEW: Automatically create the run_history folder if it doesn't exist
 if not os.path.exists("run_history"):
@@ -133,3 +134,43 @@ if uploaded_file is not None:
                         file_name=os.path.basename(st.session_state.csv_path),
                         mime="text/csv"
                     )
+                    # -----------------------------------------
+        # NEW: Q&A Chatbot Section
+        # This sits outside the training loop so you can chat anytime after data is cleaned
+        # -----------------------------------------
+        st.write("---")
+        st.subheader("💬 Chat with your Dataset")
+        st.write("Ask questions like: 'What is the average value of the target column?' or 'Which category appears most often?'")
+        
+        # Secure text input for the user's Gemini API Key
+        api_key = st.text_input("Enter your Gemini API Key to enable chat:", type="password")
+        
+        # Initialize memory for the chat interface
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+            
+        # Display all previous chat messages on the screen
+        for message in st.session_state.chat_history:
+            with st.chat_message(message["role"]):
+                st.write(message["content"])
+                
+        # The text input box where the user types their questions
+        user_question = st.chat_input("Ask a question about the cleaned data...")
+        
+        if user_question:
+            if not api_key:
+                st.warning("Please enter your Gemini API Key first.")
+            else:
+                # 1. Save and display the user's question immediately
+                st.session_state.chat_history.append({"role": "user", "content": user_question})
+                with st.chat_message("user"):
+                    st.write(user_question)
+                    
+                # 2. Pass the question to the Q&A Agent and display the response
+                with st.chat_message("assistant"):
+                    with st.spinner("AI is inspecting the spreadsheet..."):
+                        # Pass the cleaned data to the agent
+                        answer = ask_dataset_question(st.session_state.cleaned_df, user_question, api_key)
+                        st.write(answer)
+                        # Save the AI's response to memory
+                        st.session_state.chat_history.append({"role": "assistant", "content": answer})
