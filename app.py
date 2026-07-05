@@ -47,11 +47,12 @@ if uploaded_file is not None:
         
         if st.button("Train ML Model"):
             with st.spinner("ML Agent is encoding data and training the model..."):
-                # Pass the cleaned data and the user's choice to the agent
-                accuracy, trained_model = train_model(st.session_state.cleaned_df, target_column)
+                
+                # UPDATED: We now catch the score, the model, AND the metric_name
+                score, trained_model, metric_name = train_model(st.session_state.cleaned_df, target_column)
                 
                 st.success("Model training complete!")
                 
-                # Convert accuracy to a percentage and display it
-                accuracy_percentage = round(accuracy * 100, 2)
-                st.metric(label="Model Accuracy", value=f"{accuracy_percentage}%")
+                # Convert score to a percentage and display it with its correct name
+                score_percentage = round(score * 100, 2)
+                st.metric(label=metric_name, value=f"{score_percentage}%")
