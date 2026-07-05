@@ -79,7 +79,8 @@ if uploaded_file is not None:
                         clean_rows, 
                         st.session_state.viz_fig, 
                         report_df, 
-                        metric_name
+                        metric_name,
+                        target_column   # <--- THIS IS THE NEW LINE
                     )
                     
                     # Generate the Notebook
