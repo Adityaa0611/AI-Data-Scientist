@@ -1,19 +1,33 @@
 import streamlit as st
 import pandas as pd
 
-# This creates the main heading on the web page
+# NEW: Import your cleaning agent function
+from agents.cleaning_agent import clean_data 
+
 st.title("Autonomous AI Data Scientist")
 
-# This creates a file upload box for the user
 uploaded_file = st.file_uploader("Upload your dataset (CSV format)", type=["csv"])
 
-# This checks if the user has actually uploaded a file
 if uploaded_file is not None:
-    # Pandas reads the uploaded CSV file and stores it in a variable called 'df'
-    df = pd.read_csv(uploaded_file)
+    # Load the raw data
+    raw_df = pd.read_csv(uploaded_file)
     
-    # This prints a message to the screen
-    st.write("Data successfully loaded! Here are the first 5 rows:")
+    st.write("Original Data Preview:")
+    st.dataframe(raw_df.head())
     
-    # This displays the actual spreadsheet on the web page
-    st.dataframe(df.head())
+    # NEW: Add a button to trigger the Cleaning Agent
+    if st.button("Run Cleaning Agent"):
+        
+        # Shows a loading spinner while the agent processes the data
+        with st.spinner("Cleaning Agent is analyzing and fixing data..."):
+            
+            # Pass the raw data to the agent
+            cleaned_df = clean_data(raw_df)
+            
+            st.success("Data cleaning complete!")
+            st.write("Cleaned Data Preview:")
+            st.dataframe(cleaned_df.head())
+            
+            # Print a summary of what the agent did
+            st.write(f"Rows before cleaning: {len(raw_df)}")
+            st.write(f"Rows after cleaning: {len(cleaned_df)}")
