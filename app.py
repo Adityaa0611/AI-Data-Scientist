@@ -6,6 +6,7 @@ from agents.cleaning_agent import clean_data
 from agents.viz_agent import generate_correlation_heatmap
 from agents.ml_agent import train_model
 from agents.reporting_agent import generate_pdf_report # NEW
+from agents.notebook_agent import generate_notebook
 
 st.title("Autonomous AI Data Scientist")
 
@@ -65,11 +66,14 @@ if uploaded_file is not None:
                 best_model_name = report_df.iloc[0]['Model']
                 st.metric(label=f"Winner: {best_model_name} ({metric_name})", value=f"{score_percentage}%")
                 
-                # 5. NEW: Reporting Phase (Runs automatically after ML finishes)
-                with st.spinner("Reporting Agent is generating your PDF..."):
+                # 5. UPDATED: Reporting & Code Generation Phase
+                with st.spinner("Generating your PDF and Jupyter Notebook..."):
                     clean_rows = len(st.session_state.cleaned_df)
                     
-                    # Hand all the pieces over to the Reporting Agent
+                    # Save the cleaned dataset so the Notebook can read it
+                    st.session_state.cleaned_df.to_csv("cleaned_dataset.csv", index=False)
+                    
+                    # Generate the PDF
                     pdf_filename = generate_pdf_report(
                         st.session_state.raw_rows, 
                         clean_rows, 
@@ -78,11 +82,26 @@ if uploaded_file is not None:
                         metric_name
                     )
                     
-                    # Create the magic Download Button
-                    with open(pdf_filename, "rb") as pdf_file:
-                        st.download_button(
-                            label="⬇️ Download Final AI Report (PDF)",
-                            data=pdf_file,
-                            file_name="AI_Data_Scientist_Report.pdf",
-                            mime="application/pdf"
-                        )
+                    # Generate the Notebook
+                    notebook_filename = generate_notebook(target_column, metric_name)
+                    
+                    # Create two columns to put the download buttons side-by-side
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        with open(pdf_filename, "rb") as pdf_file:
+                            st.download_button(
+                                label="⬇️ Download PDF Report",
+                                data=pdf_file,
+                                file_name="AI_Data_Scientist_Report.pdf",
+                                mime="application/pdf"
+                            )
+                            
+                    with col2:
+                        with open(notebook_filename, "rb") as nb_file:
+                            st.download_button(
+                                label="⬇️ Download Jupyter Notebook",
+                                data=nb_file,
+                                file_name="Generated_ML_Code.ipynb",
+                                mime="application/x-ipynb+json"
+                            )
